@@ -5,14 +5,18 @@ import {
   getCurrentUser,
 } from "../utils/firebase";
 
+import { useRouter } from "next/router";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
       const user = await loginUser(email, password);
+      router.push("/");
       console.log("User logged in:", user);
       // Redirect to a success page
     } catch (error) {

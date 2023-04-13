@@ -7,6 +7,7 @@ import {
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyD_q7FfLzqYt1ZW20l7AY2U2z2LjG-S8oE",
@@ -23,6 +24,7 @@ const myApp = initializeApp(firebaseConfig);
 const auth = getAuth(myApp);
 const googleProvider = new GoogleAuthProvider();
 const firestore = getFirestore(myApp);
+const storage = getStorage(myApp);
 
 let currentUser = null;
 
@@ -106,6 +108,41 @@ export const getUserData = async (userId) => {
     const userDoc = await getDoc(userRef);
     if (userDoc.exists()) {
       return userDoc.data();
+    } else {
+      throw new Error("User not found.");
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const uploadAvatar = async (file, userId) => {
+  const storageRef = ref(storage, `avatars/${userId}`);
+  await uploadBytes(storageRef, file);
+  const downloadURL = await getDownloadURL(storageRef);
+  const userRef = doc(firestore, "users", userId);
+  await setDoc(userRef, { avatar: downloadURL }, { merge: true });
+  return downloadURL;
+};
+
+export const getAvatar = async (userId) => {
+  try {
+    // Get user document from Firestore collection
+    const userRef = doc(firestore, "users", userId);
+    const userDoc = await getDoc(userRef);
+
+    // Check if user document exists
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      if (userData.avatar) {
+        // If user has an avatar, return its download URL
+        return userData.avatar;
+      } else {
+        // If user does not have an avatar, return a default image or null
+        // Example:
+        // return "/default-avatar.png";
+        return "/default-avatar.png";
+      }
     } else {
       throw new Error("User not found.");
     }
