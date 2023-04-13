@@ -28,6 +28,7 @@ const Login = () => {
   const handleGoogleLogin = async () => {
     try {
       const user = await loginUserWithGoogle();
+      router.push("/");
       console.log("User logged in with Google:", user);
       // Redirect to a success page
     } catch (error) {

@@ -28,12 +28,25 @@ const storage = getStorage(myApp);
 
 let currentUser = null;
 
-auth.onAuthStateChanged((user) => {
+auth.onAuthStateChanged(async (user) => {
   if (user) {
     currentUser = user;
     if (typeof window !== "undefined") {
       localStorage.setItem("currentUser", JSON.stringify(user));
     }
+
+    if (user.photoURL) {
+      const response = await fetch(user.photoURL);
+      const blob = await response.blob();
+      const avatarRef = ref(storage, `avatars/${user.uid}`);
+      await uploadBytes(avatarRef, blob);
+
+      // Store the download URL of the user's avatar in the Firestore database
+      const downloadURL = await getDownloadURL(avatarRef);
+      const userRef = doc(firestore, "users", user.uid);
+      await setDoc(userRef, { avatar: downloadURL }, { merge: true });
+    }
+
     const userRef = doc(firestore, "users", user.uid);
     setDoc(userRef, { email: user.email }, { merge: true });
   } else {
