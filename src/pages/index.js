@@ -47,7 +47,6 @@ export default function Home() {
   useEffect(() => {
     const user = getCurrentUser();
     setUser(user);
-
   }, []);
 
   useEffect(() => {
@@ -107,6 +106,15 @@ export default function Home() {
 
               <button onClick={handleAddTask}>Add task</button>
               <TaskModal isModalOpen={isModalOpen} handleCloseModal={handleCloseModal}/>
+
+              {userData && userData.tasks && userData.tasks.map((task) => {
+                return (
+                  <div key={task.id}>
+                    <h1>{task.taskName}</h1>
+                    <p>{task.taskDescription}</p>
+                  </div>
+                )
+              })}
             </div>
           ) : (
             <div>
