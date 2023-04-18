@@ -9,6 +9,9 @@ import {
 import { Open_Sans } from "next/font/google";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Modal from "react-modal";
+import TaskModal from "@/components/taskModal";
+
 const openSans = Open_Sans({ subsets: ["latin"] });
 
 export default function Home() {
@@ -16,6 +19,8 @@ export default function Home() {
   const [userData, setUserData] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarURL, setAvatarURL] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   const handleAvatarChange = (event) => {
     setAvatarFile(event.target.files[0]);
@@ -27,9 +32,22 @@ export default function Home() {
     setAvatarURL(url);
   };
 
+  const handleAddTask = () => {
+    if(isModalOpen) {
+      setIsModalOpen(false);
+    } else {
+      setIsModalOpen(true);
+    }
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  }
+
   useEffect(() => {
     const user = getCurrentUser();
     setUser(user);
+
   }, []);
 
   useEffect(() => {
@@ -43,10 +61,15 @@ export default function Home() {
             })
             .catch((error) => console.error(error));
           setUserData(data);
+
         })
         .catch((error) => console.error(error));
     }
   }, [user]);
+  
+  useEffect(() => {
+    console.log('test');
+  }, [userData])
 
   function handleLogout() {
     logout()
@@ -81,6 +104,9 @@ export default function Home() {
                 <input type="file" onChange={handleAvatarChange} />
                 <button onClick={handleAvatarUpload}>Upload Avatar</button>
               </div>
+
+              <button onClick={handleAddTask}>Add task</button>
+              <TaskModal isModalOpen={isModalOpen} handleCloseModal={handleCloseModal}/>
             </div>
           ) : (
             <div>

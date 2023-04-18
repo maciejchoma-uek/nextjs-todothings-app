@@ -78,6 +78,23 @@ export const registerUser = async (email, password) => {
   }
 };
 
+// create a function that sends task modal input to firebase
+export const addTask = async (task) => {
+  try {
+    const userRef = doc(firestore, "users", getCurrentUser().uid);
+    const docSnap = await getDoc(userRef);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const tasks = data.tasks ? data.tasks : [];
+      tasks.push(task);
+      await setDoc(userRef, { tasks }, { merge: true });
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 export const loginUserWithGoogle = async () => {
   try {
     const userCredential = await signInWithPopup(auth, googleProvider);
