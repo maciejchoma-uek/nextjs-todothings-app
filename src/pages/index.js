@@ -5,12 +5,12 @@ import {
   logout,
   uploadAvatar,
   getAvatar,
+  deleteTask
 } from "../utils/firebase";
 import { Open_Sans } from "next/font/google";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Modal from "react-modal";
-import TaskModal from "@/components/taskModal";
+import AddTaskModal from "@/components/addTaskModal";
 
 const openSans = Open_Sans({ subsets: ["latin"] });
 
@@ -19,7 +19,7 @@ export default function Home() {
   const [userData, setUserData] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarURL, setAvatarURL] = useState(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
 
 
   const handleAvatarChange = (event) => {
@@ -33,21 +33,35 @@ export default function Home() {
   };
 
   const handleAddTask = () => {
-    if(isModalOpen) {
-      setIsModalOpen(false);
+    if(isAddTaskModalOpen) {
+      setIsAddTaskModalOpen(false);
     } else {
-      setIsModalOpen(true);
+      setIsAddTaskModalOpen(true);
     }
   }
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseAddTaskModal = () => {
+    setIsAddTaskModalOpen(false);
+  }
+
+  const handleDeleteTask = async (event,task) => {
+    event.preventDefault();
+    console.log("delete task", task);
+    await deleteTask(task);
+    fetchData();
   }
 
   useEffect(() => {
     const user = getCurrentUser();
     setUser(user);
   }, []);
+
+  const fetchData = () => {
+    getUserData(user.uid).then((data) => {
+      console.log(data);
+      setUserData(data);
+    })
+  }
 
   useEffect(() => {
     if (user) {
@@ -67,7 +81,6 @@ export default function Home() {
   }, [user]);
   
   useEffect(() => {
-    console.log('test');
   }, [userData])
 
   function handleLogout() {
@@ -105,12 +118,13 @@ export default function Home() {
               </div>
 
               <button onClick={handleAddTask}>Add task</button>
-              <TaskModal isModalOpen={isModalOpen} handleCloseModal={handleCloseModal}/>
+              <AddTaskModal isModalOpen={isAddTaskModalOpen} handleCloseModal={handleCloseAddTaskModal} fetchData={fetchData}/>
 
-              {userData && userData.tasks && userData.tasks.map((task) => {
+              {userData && userData.tasks && userData.tasks.map((task, index) => {
                 return (
-                  <div key={task.id}>
+                  <div key={index}>
                     <h1>{task.taskName}</h1>
+                    <button onClick={(event) => handleDeleteTask(event, task)}>X</button>
                     <p>{task.taskDescription}</p>
                   </div>
                 )

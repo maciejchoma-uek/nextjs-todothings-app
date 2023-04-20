@@ -6,7 +6,7 @@ import {
   signInWithPopup,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, getDoc, updateDoc } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
@@ -179,4 +179,18 @@ export const getAvatar = async (userId) => {
   } catch (error) {
     throw error;
   }
+};
+
+export const deleteTask = async (taskToDelete) => {
+  // get the current tasks array
+  const taskRef = doc(firestore, "users", getCurrentUser().uid); // add "tasks" to the doc path
+
+  const querySnapshot = await getDoc(taskRef);
+  const tasks = querySnapshot.data().tasks; // access the "tasks" field of the document data
+
+  // filter out the task to delete
+  const updatedTasks = tasks.filter((task) => task.taskName !== taskToDelete.taskName);
+
+  // update the tasks array in the Firebase store
+  await updateDoc(taskRef, { tasks: updatedTasks }); // use updateDoc to only update the "tasks" field
 };
