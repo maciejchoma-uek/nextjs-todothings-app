@@ -1,62 +1,66 @@
 import { useState } from "react";
-import {
-  loginUser,
-  loginUserWithGoogle,
-  getCurrentUser,
-} from "../utils/firebase";
+import { loginUser } from "@/utils/login";
+import { loginUserWithGoogle } from "@/utils/googleAuth";
 
 import { useRouter } from "next/router";
+import useAuth from "@/hooks/useAuth";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
-
+  const { user, isAuthChecked } = useAuth();
   const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      const user = await loginUser(email, password);
+      await loginUser(email, password);
       router.push("/");
-      console.log("User logged in:", user);
-      // Redirect to a success page
     } catch (error) {
-      console.error("Login failed:", error);
-      // Show an error message
+      setError(`Login failed: ${error}`);
     }
   };
 
   const handleGoogleLogin = async () => {
     try {
-      const user = await loginUserWithGoogle();
+      await loginUserWithGoogle();
       router.push("/");
-      console.log("User logged in with Google:", user);
-      // Redirect to a success page
     } catch (error) {
-      console.error("Google login failed:", error);
-      // Show an error message
+      setError(error);
     }
   };
 
-  return (
-    <form onSubmit={handleLogin}>
-      <label htmlFor="email">Email:</label>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <label htmlFor="password">Password:</label>
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button type="submit">Login</button>
-      <button type="button" onClick={handleGoogleLogin}>
-        Login with Google
-      </button>
-    </form>
-  );
+  if (!isAuthChecked) {
+    return <div>Loading</div>;
+  } else {
+    if (!user) {
+      return (
+        <>
+          <form onSubmit={handleLogin}>
+            <label htmlFor="email">Email:</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <label htmlFor="password">Password:</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button type="submit">Login</button>
+          </form>
+          {error.length != 0 && <div>{error}</div>}
+          <button type="button" onClick={handleGoogleLogin}>
+            Login with Google
+          </button>
+        </>
+      );
+    } else {
+      router.push("/");
+    }
+  }
 };
 
 export default Login;

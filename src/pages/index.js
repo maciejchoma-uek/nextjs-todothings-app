@@ -1,97 +1,65 @@
 import Head from "next/head";
-import {
-  getCurrentUser,
-  getUserData,
-  logout,
-  uploadAvatar,
-  getAvatar,
-  deleteTask
-} from "../utils/firebase";
+import { getUserData } from "../utils/firebase";
+import { uploadAvatar } from "@/utils/fileUpload";
+import { deleteTask } from "@/utils/taskManagement";
 import { Open_Sans } from "next/font/google";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import AddTaskModal from "@/components/addTaskModal";
+import useAuth from "@/hooks/useAuth";
 
 const openSans = Open_Sans({ subsets: ["latin"] });
 
 export default function Home() {
-  const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarURL, setAvatarURL] = useState(null);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
-
+  const { logout, user, isAuthChecked } = useAuth();
 
   const handleAvatarChange = (event) => {
     setAvatarFile(event.target.files[0]);
   };
 
   const handleAvatarUpload = async () => {
-    const userId = getCurrentUser().uid;
-    const url = await uploadAvatar(avatarFile, userId);
-    setAvatarURL(url);
+    if (avatarFile) {
+      const userId = user.uid;
+      const url = await uploadAvatar(avatarFile, userId);
+      setAvatarURL(url);
+    }
   };
 
   const handleAddTask = () => {
-    if(isAddTaskModalOpen) {
-      setIsAddTaskModalOpen(false);
-    } else {
-      setIsAddTaskModalOpen(true);
-    }
-  }
+    setIsAddTaskModalOpen(!isAddTaskModalOpen);
+  };
 
   const handleCloseAddTaskModal = () => {
     setIsAddTaskModalOpen(false);
-  }
-
-  const handleDeleteTask = async (event,task) => {
-    event.preventDefault();
-    console.log("delete task", task);
-    await deleteTask(task);
-    fetchData();
-  }
+  };
 
   useEffect(() => {
-    const user = getCurrentUser();
-    setUser(user);
-  }, []);
+    if (user) {
+      fetchData();
+    }
+  }, [user]);
+
+  const handleDeleteTask = async (event, task) => {
+    event.preventDefault();
+    await deleteTask(task);
+    fetchData();
+  };
 
   const fetchData = () => {
     getUserData(user.uid).then((data) => {
       console.log(data);
       setUserData(data);
-    })
-  }
-
-  useEffect(() => {
-    if (user) {
-      getUserData(user.uid)
-        .then((data) => {
-          getAvatar(user.uid)
-            .then((data) => {
-              setAvatarURL(data);
-              console.log(data);
-            })
-            .catch((error) => console.error(error));
-          setUserData(data);
-
-        })
-        .catch((error) => console.error(error));
-    }
-  }, [user]);
-  
-  useEffect(() => {
-  }, [userData])
+    });
+  };
 
   function handleLogout() {
-    logout()
-      .then(() => {
-        setUser(null);
-      })
-      .catch((error) => {
-        console.error("Logout failed:", error);
-        // Show an error message
-      });
+    logout().catch((error) => {
+      console.error("Logout failed:", error);
+    });
   }
 
   return (
@@ -105,38 +73,61 @@ export default function Home() {
       <main className={openSans.className}>
         {" "}
         <div>
-          {user ? (
-            <div>
-              <h1>Welcome, {user.email}!</h1>
-              <div>{userData && userData.email}</div>
-              <button onClick={handleLogout}>Logout</button>
-              <h1>Profile</h1>
-              {avatarURL && <img src={avatarURL} alt="Avatar" />}
+          {isAuthChecked ? (
+            user ? (
               <div>
-                <input type="file" onChange={handleAvatarChange} />
-                <button onClick={handleAvatarUpload}>Upload Avatar</button>
+                <h1>Welcome, {user.email}!</h1>
+                <div>{userData && userData.email}</div>
+                <button onClick={handleLogout}>Logout</button>
+                <h1>Profile</h1>
+                {avatarURL ? (
+                  <img width={300} height={300} src={avatarURL} alt="Avatar" />
+                ) : userData ? (
+                  <img width={300} height={300} src={userData.avatar} />
+                ) : (
+                  <img src={"default-avatar.png"} />
+                )}
+                <div>
+                  <input type="file" onChange={handleAvatarChange} />
+                  <button onClick={handleAvatarUpload}>Upload Avatar</button>
+                </div>
+
+                <button onClick={handleAddTask}>Add task</button>
+                <AddTaskModal
+                  isModalOpen={isAddTaskModalOpen}
+                  handleCloseModal={handleCloseAddTaskModal}
+                  fetchData={fetchData}
+                />
+
+                {userData &&
+                  userData.tasks &&
+                  userData.tasks.map((task, index) => {
+                    return (
+                      <div key={index}>
+                        <h1>{task.taskName}</h1>
+                        <button
+                          onClick={(event) => handleDeleteTask(event, task)}
+                        >
+                          X
+                        </button>
+                        <p>{task.taskDescription}</p>
+                      </div>
+                    );
+                  })}
               </div>
-
-              <button onClick={handleAddTask}>Add task</button>
-              <AddTaskModal isModalOpen={isAddTaskModalOpen} handleCloseModal={handleCloseAddTaskModal} fetchData={fetchData}/>
-
-              {userData && userData.tasks && userData.tasks.map((task, index) => {
-                return (
-                  <div key={index}>
-                    <h1>{task.taskName}</h1>
-                    <button onClick={(event) => handleDeleteTask(event, task)}>X</button>
-                    <p>{task.taskDescription}</p>
-                  </div>
-                )
-              })}
-            </div>
+            ) : (
+              <div>
+                <h1>Please log in to continue.{user}</h1>
+                <Link href="login">
+                  <button>Login</button>
+                </Link>
+                <Link href="register">
+                  <button>Register</button>
+                </Link>
+              </div>
+            )
           ) : (
-            <div>
-              <h1>Please log in to continue.</h1>
-              <Link href="login">
-                <button>Login</button>
-              </Link>
-            </div>
+            <div>Loading</div>
           )}
         </div>
       </main>
