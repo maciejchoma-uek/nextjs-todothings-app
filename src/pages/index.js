@@ -111,6 +111,7 @@ export default function Home() {
                           X
                         </button>
                         <p>{task.taskDescription}</p>
+                        <p>{task.userCity}</p>
                       </div>
                     );
                   })}

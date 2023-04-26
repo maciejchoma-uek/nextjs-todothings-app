@@ -1,6 +1,7 @@
 import Modal from "react-modal";
 import { useState } from "react";
 import { addTask } from "@/utils/taskManagement";
+import { useEffect } from "react";
 
 export default function AddTaskModal({
   isModalOpen,
@@ -9,16 +10,61 @@ export default function AddTaskModal({
 }) {
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
+  const [userLocation, setUserLocation] = useState(null);
+  const [userCity, setUserCity] = useState("");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (isModalOpen) {
+      const fetchUserCity = async (latitude, longitude) => {
+        try {
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
+          );
+          const data = await response.json();
+          if (data.address) {
+            console.log(data);
+            console.log(data.address);
+            setUserCity(
+              `${data.address.road} ${data.address.house_number}, ${
+                data.address.postcode
+              }, ${data.address.city || data.address.town || ""}`
+            );
+          }
+        } catch (error) {
+          console.error("Error fetching user city: ", error);
+        }
+      };
+      // Fetch user's location using browser's geolocation API
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            setUserLocation({ lat: latitude, lng: longitude });
+
+            try {
+              fetchUserCity(latitude, longitude);
+            } catch (error) {
+              console.error("Error getting user's city:", error);
+            }
+          },
+          (error) => {
+            console.error("Error getting user's location:", error);
+          }
+        );
+      }
+    }
+  }, [isModalOpen]);
 
   const handleSubmitForm = async (event) => {
     event.preventDefault();
     console.log(event.target);
     console.log(taskName, taskDescription);
+
     let errorOccured = false;
 
     try {
-      await addTask({ taskName, taskDescription });
+      await addTask({ taskName, taskDescription, userLocation, userCity });
     } catch (error) {
       setError(error);
       errorOccured = true;
