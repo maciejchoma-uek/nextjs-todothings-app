@@ -51,9 +51,14 @@ export default function EditTaskModal({
         ></input>
         {passedTask && JSON.stringify(passedTask)}
         <input
-          onClick={(event) => {
+          onClick={async (event) => {
             event.preventDefault();
-            editTask(originalData, { taskName, taskDescription });
+            try {
+              await editTask(originalData, { taskName, taskDescription });
+            } catch (error) {
+              console.error(error);
+            }
+            handleCloseModal();
           }}
           type="submit"
           value="edit task"

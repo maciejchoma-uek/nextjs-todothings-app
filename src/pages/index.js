@@ -60,6 +60,12 @@ export default function Home() {
 
   useEffect(() => {
     if (user) {
+      fetchData();
+    }
+  }, [isAddTaskModalOpen, isEditTaskModalOpen]);
+
+  useEffect(() => {
+    if (user) {
       const fetchUserCity = async (latitude, longitude) => {
         try {
           const response = await fetch(
@@ -193,13 +199,16 @@ export default function Home() {
                           key={index}
                         >
                           <h1>{task.taskName}</h1>
+                          <p>{task.taskDescription}</p>
+                          <p>{task.userCity}</p>
                           <button
-                            onClick={(event) => handleDeleteTask(event, task)}
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              handleDeleteTask(event, task);
+                            }}
                           >
                             X
                           </button>
-                          <p>{task.taskDescription}</p>
-                          <p>{task.userCity}</p>
                         </div>
                       );
                     })}

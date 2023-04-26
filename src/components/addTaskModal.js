@@ -41,7 +41,6 @@ export default function AddTaskModal({
       if ("vibrate" in navigator) {
         navigator.vibrate([100, 100, 100]);
       }
-      fetchData();
       handleCloseModal();
     }
   };
