@@ -3,11 +3,12 @@ import { getUserData } from "../utils/firebase";
 import { uploadAvatar } from "@/utils/fileUpload";
 import { deleteTask } from "@/utils/taskManagement";
 import { Open_Sans } from "next/font/google";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import AddTaskModal from "@/components/addTaskModal";
 import useAuth from "@/hooks/useAuth";
 import EditTaskModal from "@/components/editTaskModal";
+import PhotoModal from "@/components/photoModal";
 
 const openSans = Open_Sans({ subsets: ["latin"] });
 
@@ -19,6 +20,7 @@ export default function Home() {
   const [userLocation, setUserLocation] = useState(null);
   const [userCity, setUserCity] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [isTakePhotoModalOpen, setIsTakePhotoModalOpen] = useState(false);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
   const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
   const { logout, user, isAuthChecked } = useAuth();
@@ -46,6 +48,10 @@ export default function Home() {
 
   const handleCloseAddTaskModal = () => {
     setIsAddTaskModalOpen(false);
+  };
+
+  const handleCloseTakePhotoModal = () => {
+    setIsTakePhotoModalOpen(false);
   };
 
   const handleCloseEditTaskModal = () => {
@@ -121,6 +127,10 @@ export default function Home() {
     fetchData();
   };
 
+  const handleTakePhoto = () => {
+    setIsTakePhotoModalOpen(true);
+  };
+
   const fetchData = () => {
     getUserData(user.uid).then((data) => {
       setUserData(data);
@@ -149,6 +159,7 @@ export default function Home() {
               !isLoading ? (
                 <div>
                   <h1>Welcome, {user.email}!</h1>
+                  <button onClick={handleTakePhoto}>Capture Photo</button>
                   <div>
                     {JSON.stringify(userLocation)}
                     {userCity}
@@ -187,7 +198,11 @@ export default function Home() {
                     fetchData={fetchData}
                     passedTask={passedTask}
                   />
-
+                  <PhotoModal
+                    isModalOpen={isTakePhotoModalOpen}
+                    handleCloseModal={handleCloseTakePhotoModal}
+                    user={user}
+                  />
                   {userData &&
                     userData.tasks &&
                     userData.tasks.map((task, index) => {
