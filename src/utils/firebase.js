@@ -23,12 +23,16 @@ export const storage = getStorage(myApp);
 export const getUserData = async (userId) => {
   try {
     const userRef = doc(firestore, "users", userId);
+    const avatarRef = doc(firestore, "avatars", userId);
+    const tasksRef = doc(firestore, "tasks", userId);
     const userDoc = await getDoc(userRef);
-    if (userDoc.exists()) {
-      return userDoc.data();
-    } else {
-      throw new Error("User not found.");
-    }
+    const avatarDoc = await getDoc(avatarRef);
+    const tasksDoc = await getDoc(tasksRef);
+    return {
+      email: userDoc.data().email,
+      avatar: avatarDoc.data() ? avatarDoc.data().avatar : null,
+      tasks: tasksDoc.data() ? tasksDoc.data().tasks : null,
+    };
   } catch (error) {
     throw error;
   }

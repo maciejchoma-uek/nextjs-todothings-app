@@ -6,19 +6,25 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 export const loginUserWithGoogle = async () => {
   try {
     const userCredential = await signInWithPopup(auth, googleProvider);
+    const avatarRef = doc(firestore, "avatars", userCredential.user.uid);
     const userRef = doc(firestore, "users", userCredential.user.uid);
-    const userSnapshot = await getDoc(userRef);
-    const userData = userSnapshot.data();
+    const avatarSnapshot = await getDoc(avatarRef);
+    const userData = avatarSnapshot.data()
+      ? avatarSnapshot.data()
+      : { avatar: null };
 
     if (!userData.avatar && userCredential.user.photoURL) {
       const response = await fetch(userCredential.user.photoURL);
       const blob = await response.blob();
-      const avatarRef = ref(storage, `avatars/${userCredential.user.uid}`);
-      await uploadBytes(avatarRef, blob);
+      const storageAvatarRef = ref(
+        storage,
+        `avatars/${userCredential.user.uid}`
+      );
+      await uploadBytes(storageAvatarRef, blob);
 
-      const downloadURL = await getDownloadURL(avatarRef);
-      const userRef = doc(firestore, "users", userCredential.user.uid);
-      await setDoc(userRef, { avatar: downloadURL }, { merge: true });
+      const downloadURL = await getDownloadURL(storageAvatarRef);
+      const avatarRef = doc(firestore, "avatars", userCredential.user.uid);
+      await setDoc(avatarRef, { avatar: downloadURL }, { merge: true });
     }
 
     await setDoc(

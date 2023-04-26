@@ -6,7 +6,7 @@ export const uploadAvatar = async (file, userId) => {
   const storageRef = ref(storage, `avatars/${userId}`);
   await uploadBytes(storageRef, file);
   const downloadURL = await getDownloadURL(storageRef);
-  const userRef = doc(firestore, "users", userId);
-  await setDoc(userRef, { avatar: downloadURL }, { merge: true });
+  const avatarRef = doc(firestore, "avatars", userId);
+  await setDoc(avatarRef, { avatar: downloadURL }, { merge: true });
   return downloadURL;
 };

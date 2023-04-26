@@ -62,13 +62,7 @@ export default function Home() {
     if (user) {
       fetchData();
     }
-  }, [user]);
-
-  useEffect(() => {
-    if (user) {
-      fetchData();
-    }
-  }, [isAddTaskModalOpen, isEditTaskModalOpen]);
+  }, [isAddTaskModalOpen, isEditTaskModalOpen, isTakePhotoModalOpen]);
 
   useEffect(() => {
     if (user) {
@@ -94,6 +88,7 @@ export default function Home() {
               .join(", ");
 
             setUserCity(joinedAddress);
+            fetchData();
             setIsLoading(false);
           }
         } catch (error) {
@@ -175,7 +170,13 @@ export default function Home() {
                       alt="Avatar"
                     />
                   ) : userData ? (
-                    <img width={300} height={300} src={userData.avatar} />
+                    <img
+                      width={300}
+                      height={300}
+                      src={
+                        userData.avatar ? userData.avatar : "default-avatar.png"
+                      }
+                    />
                   ) : (
                     <img src={"default-avatar.png"} />
                   )}
@@ -213,6 +214,9 @@ export default function Home() {
                           }}
                           key={index}
                         >
+                          {/* <button onClick={() => {}}>
+                            Task {completed ? "done" : "to be done"}
+                          </button> */}
                           <h1>{task.taskName}</h1>
                           <p>{task.taskDescription}</p>
                           <p>{task.userCity}</p>
