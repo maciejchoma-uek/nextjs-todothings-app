@@ -7,56 +7,18 @@ export default function AddTaskModal({
   isModalOpen,
   handleCloseModal,
   fetchData,
+  userCity,
+  userLocation,
 }) {
   const [taskName, setTaskName] = useState("");
   const [taskDescription, setTaskDescription] = useState("");
-  const [userLocation, setUserLocation] = useState(null);
-  const [userCity, setUserCity] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (isModalOpen) {
-      setUserCity("");
-      setUserLocation("");
       setTaskName("");
       setTaskDescription("");
       setError("");
-
-      const fetchUserCity = async (latitude, longitude) => {
-        try {
-          const response = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}`
-          );
-          const data = await response.json();
-          if (data.address) {
-            setUserCity(
-              `${data.address.road} ${data.address.house_number}, ${
-                data.address.postcode
-              }, ${data.address.city || data.address.town || ""}`
-            );
-          }
-        } catch (error) {
-          console.error("Error fetching user city: ", error);
-        }
-      };
-      // Fetch user's location using browser's geolocation API
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            setUserLocation({ lat: latitude, lng: longitude });
-
-            try {
-              fetchUserCity(latitude, longitude);
-            } catch (error) {
-              console.error("Error getting user's city:", error);
-            }
-          },
-          (error) => {
-            console.error("Error getting user's location:", error);
-          }
-        );
-      }
     }
   }, [isModalOpen]);
 
