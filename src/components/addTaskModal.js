@@ -16,6 +16,12 @@ export default function AddTaskModal({
 
   useEffect(() => {
     if (isModalOpen) {
+      setUserCity("");
+      setUserLocation("");
+      setTaskName("");
+      setTaskDescription("");
+      setError("");
+
       const fetchUserCity = async (latitude, longitude) => {
         try {
           const response = await fetch(
@@ -58,8 +64,6 @@ export default function AddTaskModal({
 
   const handleSubmitForm = async (event) => {
     event.preventDefault();
-    console.log(event.target);
-    console.log(taskName, taskDescription);
 
     let errorOccured = false;
 
