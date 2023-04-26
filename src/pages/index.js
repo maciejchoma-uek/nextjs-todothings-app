@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import AddTaskModal from "@/components/addTaskModal";
 import useAuth from "@/hooks/useAuth";
+import EditTaskModal from "@/components/editTaskModal";
 
 const openSans = Open_Sans({ subsets: ["latin"] });
 
@@ -14,11 +15,18 @@ export default function Home() {
   const [userData, setUserData] = useState(null);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarURL, setAvatarURL] = useState(null);
+  const [passedTask, setPassedTask] = useState(null);
   const [userLocation, setUserLocation] = useState(null);
   const [userCity, setUserCity] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
+  const [isEditTaskModalOpen, setIsEditTaskModalOpen] = useState(false);
   const { logout, user, isAuthChecked } = useAuth();
+
+  const handlePassedTask = (task) => {
+    setPassedTask(task);
+    setIsEditTaskModalOpen(true);
+  };
 
   const handleAvatarChange = (event) => {
     setAvatarFile(event.target.files[0]);
@@ -40,6 +48,10 @@ export default function Home() {
     setIsAddTaskModalOpen(false);
   };
 
+  const handleCloseEditTaskModal = () => {
+    setIsEditTaskModalOpen(false);
+  };
+
   useEffect(() => {
     if (user) {
       fetchData();
@@ -56,7 +68,6 @@ export default function Home() {
           const data = await response.json();
 
           if (data.address) {
-            console.log(data.address);
             const address = {
               amenity: data.address.amenity,
               road: data.address.road,
@@ -164,12 +175,23 @@ export default function Home() {
                     userCity={userCity}
                     userLocation={userLocation}
                   />
+                  <EditTaskModal
+                    isModalOpen={isEditTaskModalOpen}
+                    handleCloseModal={handleCloseEditTaskModal}
+                    fetchData={fetchData}
+                    passedTask={passedTask}
+                  />
 
                   {userData &&
                     userData.tasks &&
                     userData.tasks.map((task, index) => {
                       return (
-                        <div key={index}>
+                        <div
+                          onClick={() => {
+                            handlePassedTask(task);
+                          }}
+                          key={index}
+                        >
                           <h1>{task.taskName}</h1>
                           <button
                             onClick={(event) => handleDeleteTask(event, task)}
