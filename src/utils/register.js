@@ -4,8 +4,6 @@ import { doc, setDoc } from "firebase/firestore";
 
 export const registerUser = async (email, password) => {
   try {
-    console.log(auth);
-
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       email,
@@ -18,7 +16,6 @@ export const registerUser = async (email, password) => {
       { email: userCredential.user.email },
       { merge: true }
     );
-    console.log(auth);
   } catch (error) {
     throw error;
   }

@@ -29,8 +29,6 @@ export default function AddTaskModal({
           );
           const data = await response.json();
           if (data.address) {
-            console.log(data);
-            console.log(data.address);
             setUserCity(
               `${data.address.road} ${data.address.house_number}, ${
                 data.address.postcode
@@ -72,9 +70,15 @@ export default function AddTaskModal({
     } catch (error) {
       setError(error);
       errorOccured = true;
+      if ("vibrate" in navigator) {
+        navigator.vibrate([500]);
+      }
     }
 
     if (!errorOccured) {
+      if ("vibrate" in navigator) {
+        navigator.vibrate([100, 100, 100]);
+      }
       fetchData();
       handleCloseModal();
     }

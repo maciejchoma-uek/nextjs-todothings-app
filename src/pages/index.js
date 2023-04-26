@@ -51,7 +51,6 @@ export default function Home() {
 
   const fetchData = () => {
     getUserData(user.uid).then((data) => {
-      console.log(data);
       setUserData(data);
     });
   };
