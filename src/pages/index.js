@@ -364,14 +364,20 @@ export default function Home() {
               </div>
             )
           ) : (
-            <div>
+            <div className="w-screen min-h-screen flex flex-col justify-center items-center gap-2 text-center">
               <h1>Please log in to continue.</h1>
-              <Link href="login">
-                <button>Login</button>
-              </Link>
-              <Link href="register">
-                <button>Register</button>
-              </Link>
+              <div class="flex flex-row">
+                <Link href="login">
+                  <button className="text-sm py-1 px-3 m-2 rounded-3xl bg-neutral-700 transition-all hover:bg-neutral-600">
+                    Login
+                  </button>
+                </Link>
+                <Link href="register">
+                  <button className="text-sm py-1 px-3 m-2 rounded-3xl bg-neutral-700 transition-all hover:bg-neutral-600">
+                    Register
+                  </button>
+                </Link>
+              </div>
             </div>
           )
         ) : (

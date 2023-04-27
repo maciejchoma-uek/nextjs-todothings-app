@@ -29,7 +29,7 @@ export const getUserData = async (userId) => {
     const avatarDoc = await getDoc(avatarRef);
     const tasksDoc = await getDoc(tasksRef);
     return {
-      email: userDoc.data().email,
+      email: userDoc.data() ? userDoc.data().email : null,
       avatar: avatarDoc.data() ? avatarDoc.data().avatar : null,
       tasks: tasksDoc.data() ? tasksDoc.data().tasks : null,
     };
