@@ -9,6 +9,12 @@ import AddTaskModal from "@/components/addTaskModal";
 import useAuth from "@/hooks/useAuth";
 import EditTaskModal from "@/components/editTaskModal";
 import PhotoModal from "@/components/photoModal";
+import MoonLoader from "react-spinners/MoonLoader";
+import { MdLogout, MdCameraAlt, MdFileUpload } from "react-icons/md";
+import Tippy from "@tippyjs/react";
+import { followCursor } from "tippy.js";
+import "tippy.js/dist/tippy.css";
+import "tippy.js/animations/perspective-subtle.css";
 
 const openSans = Open_Sans({ subsets: ["latin"] });
 
@@ -30,24 +36,18 @@ export default function Home() {
     setIsEditTaskModalOpen(true);
   };
 
-  const handleAvatarChange = (event) => {
+  const handleAvatarChange = async (event) => {
     const selectedFile = event.target.files[0];
     if (
       selectedFile.type === "image/png" ||
       selectedFile.type === "image/jpeg"
     ) {
-      setAvatarFile(selectedFile);
+      const userId = user.uid;
+      const url = await uploadAvatar(selectedFile, userId);
+      setAvatarURL(url);
     } else {
       // handle error for unsupported file type
       console.log("Unsupported file type");
-    }
-  };
-
-  const handleAvatarUpload = async () => {
-    if (avatarFile) {
-      const userId = user.uid;
-      const url = await uploadAvatar(avatarFile, userId);
-      setAvatarURL(url);
     }
   };
 
@@ -173,45 +173,94 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${openSans.className}`}>
-        {" "}
-        <div>
-          {isAuthChecked ? (
-            user ? (
-              !isLoading ? (
-                <div>
-                  <h1>Welcome, {user.email}!</h1>
-                  <button onClick={handleTakePhoto}>Capture Photo</button>
-                  <div>
-                    {JSON.stringify(userLocation)}
-                    {userCity}
+      <div className="w-screen bg-neutral-800 flex flex-col items-center">
+        {isAuthChecked ? (
+          user ? (
+            !isLoading ? (
+              <div>
+                <div className="w-screen flex flex-col items-center sm:flex-row bg-neutral-700 sm:items-center sm:justify-between px-1">
+                  <div className="text-sm m-2 text-center">
+                    Welcome, {user.email}!
                   </div>
-                  <div>{userData && userData.email}</div>
-                  <button onClick={handleLogout}>Logout</button>
-                  <h1>Profile</h1>
-                  {avatarURL ? (
-                    <img
-                      width={300}
-                      height={300}
-                      src={avatarURL}
-                      alt="Avatar"
-                    />
-                  ) : userData ? (
-                    <img
-                      width={300}
-                      height={300}
-                      src={
-                        userData.avatar ? userData.avatar : "default-avatar.png"
-                      }
-                    />
-                  ) : (
-                    <img width={300} height={300} src={"default-avatar.png"} />
-                  )}
-                  <div>
-                    <input type="file" onChange={handleAvatarChange} />
-                    <button onClick={handleAvatarUpload}>Upload Avatar</button>
+                  <div className="flex items-center">
+                    <Tippy
+                      content="Capture a new profile picture with camera"
+                      animation="perspective-subtle"
+                      followCursor="true"
+                      plugins={[followCursor]}
+                      placement="bottom"
+                    >
+                      <button
+                        className="rounded-full w-min h-min p-2 m-2 transition-all hover:bg-neutral-400 hover:bg-opacity-25"
+                        onClick={handleTakePhoto}
+                      >
+                        <MdCameraAlt />
+                      </button>
+                    </Tippy>
+                    {/* <div>
+                        {JSON.stringify(userLocation)}
+                        {userCity}
+                      </div> */}
+                    <Tippy
+                      content="Upload new profile picture"
+                      animation="perspective-subtle"
+                      followCursor="true"
+                      placement="bottom"
+                      plugins={[followCursor]}
+                    >
+                      <button
+                        className="rounded-full w-min h-min p-2 m-2 transition-all hover:bg-neutral-400 hover:bg-opacity-25"
+                        onClick={() => {
+                          document.getElementById("uploadFile").click();
+                        }}
+                      >
+                        <MdFileUpload />
+                      </button>
+                    </Tippy>
+                    <Tippy
+                      content="Log out"
+                      animation="perspective-subtle"
+                      followCursor="true"
+                      placement="bottom"
+                      plugins={[followCursor]}
+                    >
+                      <button
+                        className="rounded-full w-min h-min p-2 m-2 transition-all hover:bg-neutral-400 hover:bg-opacity-25"
+                        onClick={handleLogout}
+                      >
+                        <MdLogout />
+                      </button>
+                    </Tippy>
+                    <div className="overflow-hidden flex w-10 h-10 rounded-full m-2">
+                      {avatarURL ? (
+                        <img src={avatarURL} alt="Avatar" />
+                      ) : userData ? (
+                        <img
+                          src={
+                            userData.avatar
+                              ? userData.avatar
+                              : "default-avatar.png"
+                          }
+                        />
+                      ) : (
+                        <img
+                          width={300}
+                          height={300}
+                          src={"default-avatar.png"}
+                        />
+                      )}
+                      <input
+                        className="hidden"
+                        id="uploadFile"
+                        type="file"
+                        onChange={handleAvatarChange}
+                      />
+                    </div>
                   </div>
-
+                </div>
+                <main
+                  className={`flex ${openSans.className} min-h-screen bg-stone-800 max-w-lg flex-col items-center`}
+                >
                   <button onClick={handleAddTask}>Add task</button>
                   <AddTaskModal
                     isModalOpen={isAddTaskModalOpen}
@@ -269,26 +318,38 @@ export default function Home() {
                         </div>
                       );
                     })}
-                </div>
-              ) : (
-                <div>Calculating user location...</div>
-              )
+                </main>
+              </div>
             ) : (
-              <div>
-                <h1>Please log in to continue.</h1>
-                <Link href="login">
-                  <button>Login</button>
-                </Link>
-                <Link href="register">
-                  <button>Register</button>
-                </Link>
+              <div className="w-screen h-screen flex flex-col justify-center items-center">
+                <div className="m-2">
+                  <MoonLoader color="#ffffff" loading={true} size={32} />
+                </div>
+                <div className="font-light text-xs">
+                  Calculating user location...
+                </div>
               </div>
             )
           ) : (
-            <div>Loading</div>
-          )}
-        </div>
-      </main>
+            <div>
+              <h1>Please log in to continue.</h1>
+              <Link href="login">
+                <button>Login</button>
+              </Link>
+              <Link href="register">
+                <button>Register</button>
+              </Link>
+            </div>
+          )
+        ) : (
+          <div className="w-screen h-screen flex flex-col justify-center items-center">
+            <div className="m-2">
+              <MoonLoader color="#ffffff" loading={true} size={32} />
+            </div>
+            <div className="font-light text-xs">Loading...</div>
+          </div>
+        )}
+      </div>
     </>
   );
 }
