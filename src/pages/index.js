@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { getUserData } from "../utils/firebase";
 import { uploadAvatar } from "@/utils/fileUpload";
-import { deleteTask } from "@/utils/taskManagement";
+import { deleteTask, editTask } from "@/utils/taskManagement";
 import { Open_Sans } from "next/font/google";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
@@ -40,6 +40,30 @@ export default function Home() {
       const url = await uploadAvatar(avatarFile, userId);
       setAvatarURL(url);
     }
+  };
+
+  const handleCompleteTask = async (task) => {
+    let updatedTask = { ...task, isCompleted: !task.isCompleted };
+    let updatedUserData = {
+      ...userData,
+      tasks: userData.tasks.map((t) =>
+        t.taskName === task.taskName ? updatedTask : t
+      ),
+    };
+    setUserData(updatedUserData);
+  };
+
+  const handleDeleteTask = async (event, task) => {
+    event.preventDefault();
+    const updatedTasks = userData.tasks.filter(
+      (localTask) => localTask.taskName !== task.taskName
+    );
+
+    setUserData({
+      ...userData,
+      tasks: updatedTasks,
+    });
+    await deleteTask(task);
   };
 
   const handleAddTask = () => {
@@ -115,12 +139,6 @@ export default function Home() {
       }
     }
   }, [user]);
-
-  const handleDeleteTask = async (event, task) => {
-    event.preventDefault();
-    await deleteTask(task);
-    fetchData();
-  };
 
   const handleTakePhoto = () => {
     setIsTakePhotoModalOpen(true);
@@ -214,10 +232,21 @@ export default function Home() {
                           }}
                           key={index}
                         >
-                          {/* <button onClick={() => {}}>
-                            Task {completed ? "done" : "to be done"}
-                          </button> */}
+                          <button
+                            onClick={async (event) => {
+                              event.stopPropagation();
+                              await handleCompleteTask(task);
+                              await editTask(
+                                task,
+                                task,
+                                task.isCompleted ? false : true
+                              );
+                            }}
+                          >
+                            Task {task.isCompleted ? "done" : "to be done"}
+                          </button>
                           <h1>{task.taskName}</h1>
+                          <p>{task.isCompleted ? "true" : "false"}</p>
                           <p>{task.taskDescription}</p>
                           <p>{task.userCity}</p>
                           <button

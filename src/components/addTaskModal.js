@@ -28,7 +28,13 @@ export default function AddTaskModal({
     let errorOccured = false;
 
     try {
-      await addTask({ taskName, taskDescription, userLocation, userCity });
+      await addTask({
+        taskName,
+        taskDescription,
+        userLocation,
+        userCity,
+        isCompleted: false,
+      });
     } catch (error) {
       setError(error);
       errorOccured = true;

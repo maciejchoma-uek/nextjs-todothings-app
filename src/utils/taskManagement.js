@@ -36,7 +36,7 @@ export const deleteTask = async (taskToDelete) => {
   await updateDoc(taskRef, { tasks: updatedTasks });
 };
 
-export const editTask = async (taskToEdit, editedTask) => {
+export const editTask = async (taskToEdit, editedTask, changeState) => {
   const taskRef = doc(firestore, "tasks", auth.currentUser.uid);
   const docSnapshot = await getDoc(taskRef);
   if (docSnapshot.exists()) {
@@ -47,6 +47,9 @@ export const editTask = async (taskToEdit, editedTask) => {
 
     tasks[indexToUpdate].taskName = editedTask.taskName;
     tasks[indexToUpdate].taskDescription = editedTask.taskDescription;
+    if (changeState != undefined && changeState != null) {
+      tasks[indexToUpdate].isCompleted = changeState;
+    }
 
     await updateDoc(taskRef, { tasks });
   } else {
