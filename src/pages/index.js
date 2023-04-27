@@ -31,7 +31,16 @@ export default function Home() {
   };
 
   const handleAvatarChange = (event) => {
-    setAvatarFile(event.target.files[0]);
+    const selectedFile = event.target.files[0];
+    if (
+      selectedFile.type === "image/png" ||
+      selectedFile.type === "image/jpeg"
+    ) {
+      setAvatarFile(selectedFile);
+    } else {
+      // handle error for unsupported file type
+      console.log("Unsupported file type");
+    }
   };
 
   const handleAvatarUpload = async () => {
@@ -196,7 +205,7 @@ export default function Home() {
                       }
                     />
                   ) : (
-                    <img src={"default-avatar.png"} />
+                    <img width={300} height={300} src={"default-avatar.png"} />
                   )}
                   <div>
                     <input type="file" onChange={handleAvatarChange} />
