@@ -177,7 +177,7 @@ export default function Home() {
         {isAuthChecked ? (
           user ? (
             !isLoading ? (
-              <div>
+              <>
                 <div className="w-screen flex flex-col items-center sm:flex-row bg-neutral-700 sm:items-center sm:justify-between px-1">
                   <div className="text-sm m-2 text-center">
                     Welcome, {user.email}!
@@ -188,6 +188,7 @@ export default function Home() {
                       animation="perspective-subtle"
                       followCursor="true"
                       plugins={[followCursor]}
+                      trigger="mouseenter"
                       placement="bottom"
                     >
                       <button
@@ -202,10 +203,11 @@ export default function Home() {
                         {userCity}
                       </div> */}
                     <Tippy
-                      content="Upload new profile picture"
+                      content="Upload a new profile picture"
                       animation="perspective-subtle"
                       followCursor="true"
                       placement="bottom"
+                      trigger="mouseenter"
                       plugins={[followCursor]}
                     >
                       <button
@@ -222,6 +224,7 @@ export default function Home() {
                       animation="perspective-subtle"
                       followCursor="true"
                       placement="bottom"
+                      trigger="mouseenter"
                       plugins={[followCursor]}
                     >
                       <button
@@ -319,7 +322,7 @@ export default function Home() {
                       );
                     })}
                 </main>
-              </div>
+              </>
             ) : (
               <div className="w-screen h-screen flex flex-col justify-center items-center">
                 <div className="m-2">
