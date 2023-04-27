@@ -10,7 +10,14 @@ import useAuth from "@/hooks/useAuth";
 import EditTaskModal from "@/components/editTaskModal";
 import PhotoModal from "@/components/photoModal";
 import MoonLoader from "react-spinners/MoonLoader";
-import { MdLogout, MdCameraAlt, MdFileUpload } from "react-icons/md";
+import {
+  MdLogout,
+  MdCameraAlt,
+  MdFileUpload,
+  MdCheckBoxOutlineBlank,
+  MdCheckBox,
+  MdDelete,
+} from "react-icons/md";
 import Tippy from "@tippyjs/react";
 import { followCursor } from "tippy.js";
 import "tippy.js/dist/tippy.css";
@@ -173,7 +180,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <div className="w-screen bg-neutral-800 flex flex-col items-center">
+      <div className="w-screen bg-neutral-800 flex flex-col items-center min-h-screen">
         {isAuthChecked ? (
           user ? (
             !isLoading ? (
@@ -262,9 +269,14 @@ export default function Home() {
                   </div>
                 </div>
                 <main
-                  className={`flex ${openSans.className} min-h-screen bg-stone-800 max-w-lg flex-col items-center`}
+                  className={`flex ${openSans.className} bg-neutral-800 w-full flex-col items-center`}
                 >
-                  <button onClick={handleAddTask}>Add task</button>
+                  <button
+                    onClick={handleAddTask}
+                    className="text-sm py-1 px-3 m-2 rounded-3xl bg-neutral-700 transition-all hover:bg-neutral-600"
+                  >
+                    Add task
+                  </button>
                   <AddTaskModal
                     isModalOpen={isAddTaskModalOpen}
                     handleCloseModal={handleCloseAddTaskModal}
@@ -288,12 +300,18 @@ export default function Home() {
                     userData.tasks.map((task, index) => {
                       return (
                         <div
+                          className={`w-full flex flex-wrap justify-evenly items-center border-neutral-700 p-2 cursor-pointer ${
+                            index % 2 == 0
+                              ? "bg-neutral-700 bg-opacity-25"
+                              : "bg-neutral-800"
+                          } ${task.isCompleted ? "opacity-50" : ""}`}
                           onClick={() => {
                             handlePassedTask(task);
                           }}
                           key={index}
                         >
                           <button
+                            className="rounded-full w-min h-min p-2 m-2 transition-all hover:bg-neutral-500 hover:bg-opacity-25"
                             onClick={async (event) => {
                               event.stopPropagation();
                               await handleCompleteTask(task);
@@ -304,19 +322,31 @@ export default function Home() {
                               );
                             }}
                           >
-                            Task {task.isCompleted ? "done" : "to be done"}
+                            {task.isCompleted ? (
+                              <MdCheckBox />
+                            ) : (
+                              <MdCheckBoxOutlineBlank />
+                            )}
                           </button>
-                          <h1>{task.taskName}</h1>
-                          <p>{task.isCompleted ? "true" : "false"}</p>
-                          <p>{task.taskDescription}</p>
-                          <p>{task.userCity}</p>
+                          <div className="w-2/4">
+                            <h1 className="font-bold break-all">
+                              {task.taskName}
+                            </h1>
+                            <p className="text-xs break-all mt-1 mb-2">
+                              {task.taskDescription}
+                            </p>
+                            <p className="text-xs text-neutral-300">
+                              {task.userCity}
+                            </p>
+                          </div>
                           <button
+                            className="rounded-full w-min h-min p-2 m-2 transition-all hover:bg-neutral-500 hover:bg-opacity-25"
                             onClick={(event) => {
                               event.stopPropagation();
                               handleDeleteTask(event, task);
                             }}
                           >
-                            X
+                            <MdDelete />
                           </button>
                         </div>
                       );
