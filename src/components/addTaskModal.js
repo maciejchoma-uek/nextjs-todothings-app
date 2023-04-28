@@ -61,33 +61,56 @@ export default function AddTaskModal({
 
   return (
     <Modal
-      overlayClassName="fixed top-0 left-0 right-0 bottom-0 bg-blue-700 bg-opacity-25 backdrop-blur-sm z-0"
-      className="absolute top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4 width-10/12 z-1 h-4/6 max-h-10/12 bg-blue-950 flex justify-center align-middle"
+      overlayClassName="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-25 backdrop-blur-sm z-0"
+      className="absolute top-2/4 left-2/4 -translate-x-2/4 -translate-y-2/4 w-10/12 sm:w-5/12 z-1 h-4/6 rounded-2xl max-h-10/12 bg-neutral-800"
       isOpen={isModalOpen}
       onRequestClose={handleCloseModal}
     >
-      <form>
-        <label htmlFor="taskName">Task Name</label>
-        <input
-          onChange={handleTaskName}
-          name="taskName"
-          placeholder="Task name"
-        ></input>
-        <label htmlFor="taskDescription">Task Description</label>
-        <input
-          onChange={handleTaskDescription}
-          name="taskDescription"
-          placeholder="Task description"
-        ></input>
-        <input
-          onClick={(event) => {
-            handleSubmitForm(event);
-          }}
-          type="submit"
-          value="add task"
-        ></input>
-      </form>
-      {error.length != 0 && <div>{error.toString()}</div>}
+      <div className="flex flex-col h-full justify-center items-center">
+        <h1 className="text-2xl font-bold mb-5">Add a new task</h1>
+        <form className="flex flex-col gap-2 items-center">
+          <label htmlFor="taskName" className="font-bold text-sm text-center">
+            Task Name
+          </label>
+          <input
+            required
+            onChange={handleTaskName}
+            name="taskName"
+            placeholder="Enter a task name..."
+            className="!outline-none text-sm placeholder:leading-normal transition-all placeholder:text-xs pb-1.5 placeholder:text-neutral-200 px-3 py-1 rounded-2xl bg-neutral-700 focus:bg-neutral-600 hover:bg-neutral-600"
+          ></input>
+          <label
+            htmlFor="taskDescription"
+            className="font-bold text-sm text-center"
+          >
+            Task Description
+          </label>
+          <input
+            required
+            onChange={handleTaskDescription}
+            name="taskDescription"
+            placeholder="Enter a description..."
+            className="!outline-none text-sm placeholder:leading-normal transition-all placeholder:text-xs pb-1.5 placeholder:text-neutral-200 px-3 py-1 rounded-2xl bg-neutral-700 focus:bg-neutral-600 hover:bg-neutral-600"
+          ></input>
+          {error.length != 0 && (
+            <div className="text-xs font-light text-red-600">
+              {error.toString()}
+            </div>
+          )}
+          <input
+            onClick={(event) => {
+              if (taskName.length == 0 || taskDescription.length == 0) {
+                setError("Please fill in both fields.");
+              } else {
+                handleSubmitForm(event);
+              }
+            }}
+            type="submit"
+            className="text-sm py-1 px-4 m-1 rounded-3xl bg-neutral-700 transition-all hover:bg-neutral-600 cursor-pointer"
+            value="Add a new task"
+          ></input>
+        </form>
+      </div>
     </Modal>
   );
 }

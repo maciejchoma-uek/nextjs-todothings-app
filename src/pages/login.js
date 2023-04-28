@@ -89,7 +89,7 @@ const Login = () => {
                 <div className="text-xs font-light text-red-600">{error}</div>
               )}
               <button
-                className="text-sm py-1 px-4 sm:w-2/4 px-1 m-1 rounded-3xl bg-neutral-700 transition-all hover:bg-neutral-600"
+                className="text-sm py-1 sm:w-2/4 px-1 m-1 rounded-3xl bg-neutral-700 transition-all hover:bg-neutral-600"
                 type="submit"
               >
                 Login
