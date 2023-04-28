@@ -56,7 +56,7 @@ const Login = () => {
     if (!user) {
       return (
         <div className="w-screen bg-neutral-800 flex flex-col items-center min-h-screen justify-center">
-          <div class="sm:bg-neutral-700 w-3/4 sm:w-8/12 sm:bg-opacity-25 rounded-2xl px-8 py-16 flex flex-col gap-2 items-center">
+          <div className="sm:bg-neutral-700 w-3/4 sm:w-8/12 sm:bg-opacity-25 rounded-2xl px-8 py-16 flex flex-col gap-2 items-center">
             <form
               className="flex flex-col items-center text-center gap-2 sm:w-3/4"
               onSubmit={handleLogin}

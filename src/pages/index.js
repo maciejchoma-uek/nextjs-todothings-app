@@ -53,8 +53,7 @@ export default function Home() {
       const url = await uploadAvatar(selectedFile, userId);
       setAvatarURL(url);
     } else {
-      // handle error for unsupported file type
-      console.log("Unsupported file type");
+      console.error("Unsupported file type.");
     }
   };
 
@@ -366,7 +365,7 @@ export default function Home() {
           ) : (
             <div className="w-screen min-h-screen flex flex-col justify-center items-center gap-2 text-center">
               <h1>Please log in to continue.</h1>
-              <div class="flex flex-row">
+              <div className="flex flex-row">
                 <Link href="login">
                   <button className="text-sm py-1 px-3 m-2 rounded-3xl bg-neutral-700 transition-all hover:bg-neutral-600">
                     Login

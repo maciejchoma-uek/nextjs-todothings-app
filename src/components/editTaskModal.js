@@ -14,12 +14,10 @@ export default function EditTaskModal({
 
   const handleTaskName = (event) => {
     setTaskName(event.target.value);
-    console.log(event.target.value);
   };
 
   const handleTaskDescription = (event) => {
     setTaskDescription(event.target.value);
-    console.log(event.target.value);
   };
 
   useEffect(() => {
